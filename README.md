@@ -1,4 +1,5 @@
 # Easy-pwd
+A somewhat basic password manager for web application in python.
 
 **As for now, the purpose of this project is to have fun and to learn about cryptography.**
 
