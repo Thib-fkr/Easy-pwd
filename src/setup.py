@@ -55,7 +55,7 @@ def install_dependencies() -> int:
     # Check internet connection
     address = gethostbyname(gethostname())
     if address == "127.0.0.1":
-        print("[-] Please connect your device to the internet, then try to re-try")
+        print("[-] Please connect your device to the internet first, then try again")
         return 1
 
     print("[+] Connected to internet !")
