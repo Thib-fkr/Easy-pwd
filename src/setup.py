@@ -1,4 +1,5 @@
     
+from os import urandom
 from sys import executable, argv
 from subprocess import CalledProcessError, check_call
 from socket import gethostbyname, gethostname
@@ -24,6 +25,16 @@ def main():
                 if change_storage_path() == 1:
                     return
             
+            # Is it asked to create the master password ?
+            if 'm' in arg:
+                try:
+                    from manager import create_master_pwd
+                except ImportError:
+                    print("[-] Something went wrong while importing modules")
+                    print("[-] Please install needed dependencies with the flag -d")
+                    return
+                create_master_pwd()
+            
             # Quit the program if all selected tasks have been performed
             return
 
@@ -41,6 +52,14 @@ def main():
         
         if change_storage_path() == 1:
             return
+        
+        try:
+            from manager import create_master_pwd
+        except ImportError:
+            print("[-] Something went wrong while importing modules")
+            print("[-] Please install needed dependencies with the flag -d")
+            return
+        create_master_pwd()
   
           
 def install_dependencies() -> int:
@@ -88,31 +107,51 @@ def change_storage_path() -> int:
         
         # If the path is valid
         if exists(path):
-            try:
-                from yaml import Loader, Dumper, load, dump
-            except ImportError as e:
-                print("[-] Something went wrong while importing modules")
-                print("[-] Please install needed dependencies with the flag -d")
+            # Place it into config.yml
+            if put_into_config("path", path) == 1:
                 return 1
-
-            # Load config data
-            with open("data/config.yml", "r") as f:
-                data = load(f, Loader=Loader)
-                if (data is None) or (len(data) == 0):
-                    print["[-] Something went wrong while reading config.yml"]
-                    return 1
-                data["path"] = path
-
-            # Write updated config data
-            with open("data/config.yml", "w") as f:
-                dump(data, f, Dumper=Dumper)
-
-            break
         else:
             print("[-] Invalid path name")
     
     return 0
+ 
             
+def generate_verification_key() -> int:
+    """
+    Generate a random key and store it into config.yml.
+    """
+    if put_into_config("key", urandom(16)) == 1:
+        return 1
+    else:
+        return 0
+    
+
+def put_into_config(key:str, value) -> int:
+    """
+    Put a pair of key/value into the file : config.yml.
+    """
+    try:
+        from yaml import Loader, Dumper, load, dump
+    except ImportError as e:
+        print("[-] Something went wrong while importing modules")
+        print("[-] Please install needed dependencies with the flag -d")
+        return 1
+
+    # Load config data
+    with open("data/config.yml", "r") as f:
+        data = load(f, Loader=Loader)
+        if (data is None) or (len(data) == 0):
+            print["[-] Something went wrong while reading config.yml"]
+            return 1
+        
+        data[key] = value
+
+    # Write updated config data
+    with open("data/config.yml", "w") as f:
+        dump(data, f, Dumper=Dumper)
+
+    return 0
+
 
 if __name__ == "__main__":
     main()
