@@ -21,7 +21,11 @@ The **p** flag prompt the user to chose a new **storage path**.
 Please only use it when you launch the program for the first time in order to chose where your data will be stored, preferably in an external storage device.
 *If you change the storage path afterwards, the data previously stored there won't be deleted automaticaly.*
 
+The **m** flag prompt the user to create a master password.
+Please also only use it when you launch the program for the first time.
+There is no way to change the master password *and* keeping the stored data *yet*.
+
 For running every available tasks :
 ```bash
-python src/setup.py -dp
+python src/setup.py -mdp
 ```
