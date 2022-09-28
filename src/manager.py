@@ -89,7 +89,8 @@ def create_master_pwd():
     with open("data/verification.yml", 'w') as f:
         dump(data, f, Dumper=Dumper)
 
-def verify_master_password() -> bool:
+
+def verify_master_password() -> bytes:
     """
     Return True if the password entered by the user is the master password.
     """
@@ -107,12 +108,72 @@ def verify_master_password() -> bool:
     )
 
     # Re-create encryption algorithm
-    enc2 = AESGCM(kdf.derive(getpass().encode()))
+    pwd = kdf.derive(getpass("[+] Enter the master password : ").encode())
+    enc2 = AESGCM(pwd)
     
     # Load the verification key
     with open("data/config.yml", "r") as f:
         key = load(f, Loader=Loader)["key"]
         
     # Compare the verification key with the decrypted data
-    return enc2.decrypt(data["salt2"], data["hash"], None) == key
-            
+    return pwd if enc2.decrypt(data["salt2"], data["hash"], None) == key else b''
+
+
+def register_account(site:str):
+    """
+    Encrypt the authentication information about a website.
+    """
+    
+    # Check master password
+    key : bytes = verify_master_password()
+    if key == b'':
+        print("[-] Master password incorrect")
+        return
+    
+    # Get Website list
+    with open("data/sites/0.yml", "r") as f:
+        data = load(f, Loader=Loader)
+    
+    # Get the title of the to-be-created file
+    number = next(iter(data["website"][-1].keys())) + 1
+    
+    # Append authentication information to website list
+    data["website"].append( {number : encrypt(key, site.encode())} )
+    
+    # Write actualized data to the file
+    with open("data/sites/0.yml", "w") as f:
+        dump(data, f, Dumper=Dumper)
+        
+    # Get authentication information
+    username : bytes = input(f"[+] Enter username/email for {site} : ").encode()
+    pwd : bytes = getpass(f"[+] Enter password for {site} : ").encode()
+    
+    # Encrypt it
+    enc_1 = encrypt(key, username)
+    enc_2 = encrypt(key, pwd)
+    
+    # Write it in the file
+    with open(f"data/sites/{number}.yml", 'w') as f:
+        dump({  "algorithm" : enc_1["algorithm"],
+                "salt1" : enc_1["salt"],
+                "username" : enc_1["hash"],
+                "salt2" : enc_2["salt"],
+                "password" : enc_2["hash"]}, f, Dumper=Dumper)
+
+
+def encrypt(key:bytes, value:bytes, length:int = 32) -> dict:
+    """
+    Encrypt the value with the key using AES-GCM algorithm.
+    """
+    # Set default key length to 32 if entered length is not valid
+    if length not in (16, 24, 32):
+        length = 32
+
+    # Encrypt value
+    enc = AESGCM(key)
+    salt = urandom(length)
+    return {
+        "algorithm" : f"AES-{str(length*8)}-GCM",
+        "salt" : salt,
+        "hash" : enc.encrypt(salt, value, None)
+    }
