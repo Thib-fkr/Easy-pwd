@@ -33,6 +33,8 @@ def main():
                     print("[-] Something went wrong while importing modules")
                     print("[-] Please install needed dependencies with the flag -d")
                     return
+                if generate_verification_key() == 1:
+                    return
                 create_master_pwd()
             
             # Quit the program if all selected tasks have been performed
@@ -58,6 +60,8 @@ def main():
         except ImportError:
             print("[-] Something went wrong while importing modules")
             print("[-] Please install needed dependencies with the flag -d")
+            return
+        if generate_verification_key() == 1:
             return
         create_master_pwd()
   
@@ -110,6 +114,8 @@ def change_storage_path() -> int:
             # Place it into config.yml
             if put_into_config("path", path) == 1:
                 return 1
+            else:
+                break
         else:
             print("[-] Invalid path name")
     
