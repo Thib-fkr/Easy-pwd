@@ -1,3 +1,5 @@
 data/verification.yml
 data/config.yml
 __pycache__
+geckodriver.log
+selenium-driver/
