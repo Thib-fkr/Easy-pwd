@@ -1,5 +1,6 @@
     
 from os import urandom
+from os.path import isfile
 from sys import executable, argv
 from subprocess import CalledProcessError, check_call
 from socket import gethostbyname, gethostname
@@ -65,7 +66,26 @@ def main():
             return
         create_master_pwd()
   
-          
+
+def create_config_file() -> int:
+    """
+    Create the config.yml file containing application name and version.
+    """
+    try:
+        from yaml import Loader, Dumper, load, dump
+    except ImportError as e:
+        print("[-] Something went wrong while importing modules")
+        print("[-] Please install needed dependencies with the flag -d")
+        return 1
+    
+    # Write original data
+    with open("data/config.yml", "w") as f:
+        dump({"name": "Easy-pwd", "version": "0.1.0"}, f, Dumper=Dumper)
+        
+
+    return 0
+
+
 def install_dependencies() -> int:
     """
     First check the internet connectivity, then try to install dependencies from requirements.txt
@@ -142,6 +162,10 @@ def put_into_config(key:str, value) -> int:
         print("[-] Something went wrong while importing modules")
         print("[-] Please install needed dependencies with the flag -d")
         return 1
+    
+    # Create the config file if not found
+    if not isfile("data/config.yml"):
+        create_config_file()
 
     # Load config data
     with open("data/config.yml", "r") as f:
