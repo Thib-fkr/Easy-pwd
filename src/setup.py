@@ -57,14 +57,14 @@ def main():
             return
         
         try:
-            from manager import create_master_pwd
+            from manager import Manager
         except ImportError:
             print("[-] Something went wrong while importing modules")
             print("[-] Please install needed dependencies with the flag -d")
             return
         if generate_verification_key() == 1:
             return
-        create_master_pwd()
+        Manager.create_master_pwd()
   
 
 def create_config_file() -> int:
