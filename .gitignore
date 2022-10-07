@@ -1,5 +1,11 @@
+# Configuration related files
 data/verification.yml
 data/config.yml
+
+# Python related files
 __pycache__
+test.py
+
+# Web driver related files
 geckodriver.log
 selenium-driver/
