@@ -1,6 +1,6 @@
 # Configuration related files
 data/verification.yml
-data/config.yml
+data/sites
 
 # Python related files
 __pycache__
