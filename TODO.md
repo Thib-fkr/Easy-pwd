@@ -4,3 +4,5 @@
 - [x] Re-implement manager.py as a class  
 - [ ] Find ways to attach selenium webdriver to any already open browser (Chrome, Firefox, Edge)
 - [ ] Implement auto-fill of authentication information with selenium when the right URL is found
+- [ ] Try to improve security issues such as input sanitization and website verification
+- [ ] Refactor code and comments
