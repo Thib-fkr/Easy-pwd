@@ -23,7 +23,7 @@ Please only use it when you launch the program for the first time in order to ch
 
 The **m** flag prompt the user to create a master password.
 Please also only use it when you launch the program for the first time.
-There is no way to change the master password *and* keeping the stored data *yet*.
+There is no way to change the master password *and* keep the stored data *yet*.
 
 For running every available tasks :
 ```bash
