@@ -13,7 +13,7 @@ python src/setup.py
 ```
 
 Setup.py will perform every tasks by default.
-If you know what you are doing, you can make setup.py perform tasks independently by placing as many as the flags that are described below behing a single dash symbol (example after the description of the flags).
+If you know what you are doing, you can make setup.py perform tasks independently by placing as many as you want of the flags that are described below behind a single dash symbol (example follows the description of the flags).
 
 The **d** flag install depedencies listed in [requirements.txt](requirements.txt).
 
