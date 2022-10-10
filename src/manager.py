@@ -127,9 +127,17 @@ class Manager():
         self.kek = pwd if enc2.decrypt(data["salt2"], data["hash"], None) == key else b''
 
 
-    def register_account(self, site:str):
+    def register_account(self, site:str, tag1:str, tag2:str):
         """
         Encrypt the authentication information about a website.
+        
+        Inputs:
+        -------
+        site : url of a web page
+        tag1 : name of the username field element in HTML page
+        tag2 : name of the password field element in HTML page
+        
+        Might need to sanitize inputs before manipulating data.
         """
         
         # Check master password
@@ -165,8 +173,10 @@ class Manager():
             dump({  "algorithm" : enc_1["algorithm"],
                     "salt1" : enc_1["salt"],
                     "username" : enc_1["hash"],
+                    "username_tag" : tag1,
                     "salt2" : enc_2["salt"],
-                    "password" : enc_2["hash"]}, f, Dumper=Dumper)
+                    "password" : enc_2["hash"],
+                    "password_tag" : tag2}, f, Dumper=Dumper)
 
 
     @staticmethod
