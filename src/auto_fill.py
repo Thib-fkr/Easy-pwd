@@ -3,6 +3,7 @@ from yaml import load, Loader
 
 from selenium import webdriver
 from selenium.webdriver.firefox.service import Service
+from selenium.webdriver.common.by import By
 
 from manager import Manager as Man
 
@@ -36,7 +37,10 @@ def main():
             clear_auth = \
                 (man.decrypt(hash=enc_auth["username"], salt=enc_auth["salt1"]).decode() , \
                 man.decrypt(hash=enc_auth["password"], salt=enc_auth["salt2"]).decode())
-            print(clear_auth)
+            
+            driver.find_element(by=By.NAME, value="username").send_keys(clear_auth[0])
+            
+            driver.find_element(by=By.NAME, value="pwd").send_keys(clear_auth[1])
             
             
 
