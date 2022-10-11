@@ -11,12 +11,12 @@ from cryptography.hazmat.primitives.kdf.pbkdf2 import PBKDF2HMAC
 from cryptography.hazmat.primitives.ciphers.aead import AESGCM
 
 class Manager():
-    
+
 
     def __init__(self):
         self.kek : bytes = b''
-    
-    
+
+
     @staticmethod
     def create_master_pwd():
         """
@@ -26,13 +26,13 @@ class Manager():
         if isfile("data/verification.yml"):
             print("[-] Master password already created.")
             return
-        
+
         # Display a text to help the user chose his password
         print("[+] In order to use the application, you need to chose a password")
         print("[+] You will be asked to type it whenever you want to launch the application\n")
         print("[+] It is important to chose a strong password (at the very least 16 characters), with :")
         print("\t-lowercase and uppercase letters\n\t-digits\n\t-special characters\n")
-        
+
 
         # Password requirements
         # ---------------------
@@ -61,7 +61,7 @@ class Manager():
 
         # Prepare the salt for the KDF
         salt1 = urandom(32)
-        
+
         # Create Key Derivation Function using PBKDF2-HMAC-SHA256 with 123 456 iterations
         kdf = PBKDF2HMAC(
             algorithm=hashes.SHA256(),
@@ -69,20 +69,20 @@ class Manager():
             salt=salt1,
             iterations=123456,
             )
-        
+
         # Here is the encryption key for AES encryption
         pwd = kdf.derive(pwd.encode())
-        
+
         # Generate encryption algorithm : AES-256-GCM
         enc = AESGCM(pwd)
-        
+
         # Prepare the salt
         salt2 = urandom(32)
-        
+
         # Encrypt the key present in the config file
         with open("data/config.yml", "r") as f:
             encrypted = enc.encrypt(salt2, load(f, Loader=Loader)["key"], None)
-        
+
         data = {
             "algorithm1" : "PBKDF2-HMAC-SHA256(123456)",
             "salt1" : salt1,
@@ -102,11 +102,11 @@ class Manager():
         Derive the key encryption key from the master password.
         (Might investigate memory safety later)
         """
-        
+
         # Get verification key and ecryption information from verification.yml
         with open("data/verification.yml", 'rb') as f:
             data = load(f, Loader=Loader)
-        
+
         # Re-create the KDF
         kdf = PBKDF2HMAC(
             algorithm=hashes.SHA256(),
@@ -118,11 +118,11 @@ class Manager():
         # Re-create encryption algorithm
         pwd = kdf.derive(getpass("[+] Enter the master password : ").encode())
         enc2 = AESGCM(pwd)
-        
+
         # Load the verification key
         with open("data/config.yml", "r") as f:
             key = load(f, Loader=Loader)["key"]
-            
+
         # Compare the verification key with the decrypted data
         self.kek = pwd if enc2.decrypt(data["salt2"], data["hash"], None) == key else b''
 
@@ -130,44 +130,44 @@ class Manager():
     def register_account(self, site:str, tag1:str, tag2:str):
         """
         Encrypt the authentication information about a website.
-        
+
         Inputs:
         -------
         site : url of a web page
         tag1 : name of the username field element in HTML page
         tag2 : name of the password field element in HTML page
-        
+
         Might need to sanitize inputs before manipulating data.
         """
-        
+
         # Check master password
         key : bytes = self.kek
         if key == b'':
             self.register()
             key = self.kek
-        
+
         # Get Website list
         with open("data/sites/0.yml", "r") as f:
             data = load(f, Loader=Loader)
-        
+
         # Get the title of the to-be-created file
         number = next(iter(data["website"][-1].keys())) + 1
-        
+
         # Append authentication information to website list
         data["website"].append( {number : self.encrypt(key, site.encode())} )
-        
+
         # Write actualized data to the file
         with open("data/sites/0.yml", "w") as f:
             dump(data, f, Dumper=Dumper)
-            
+
         # Get authentication information
         username : bytes = input(f"[+] Enter username/email for {site} : ").encode()
         pwd : bytes = getpass(f"[+] Enter password for {site} : ").encode()
-        
+
         # Encrypt it
         enc_1 = self.encrypt(key, username)
         enc_2 = self.encrypt(key, pwd)
-        
+
         # Write it in the file
         with open(f"data/sites/{number}.yml", 'w') as f:
             dump({  "algorithm" : enc_1["algorithm"],
@@ -202,11 +202,11 @@ class Manager():
         """
         Decrypt the value encrypted with AES-GCM algorithm
         """
-        
+
         pwd = self.kek
         if pwd == b'':
             self.register()
             pwd = self.kek
-            
+
         enc = AESGCM(pwd)
         return enc.decrypt(salt, hash, None)

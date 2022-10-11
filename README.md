@@ -3,7 +3,7 @@ A somewhat basic password manager for web application in python.
 
 **As for now, the purpose of this project is to have fun and to learn about cryptography.**
 
-It is not recommended to "[roll your own](https://security.stackexchange.com/questions/18197/why-shouldnt-we-roll-our-own/)" when speaking about cybersecurity tools. Once again, this project is for educationnal purposes only and should not be used in a professional environment. 
+It is not recommended to "[roll your own](https://security.stackexchange.com/questions/18197/why-shouldnt-we-roll-our-own/)" when speaking about cybersecurity tools. Once again, this project is for educationnal purposes only and should not be used in a professional environment.
 
 ## Install
 Supposing you have python (>= 3.10.4) and pip installed, you just have to run setup.py as below :
